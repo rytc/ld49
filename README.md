@@ -1,2 +1,2 @@
-# Ludum Dare 49 Comp Game
+# Ludum Dare 49 Jam Game
 
