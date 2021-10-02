@@ -126,6 +126,7 @@ can_move(Entity* ent, s32 dst_x, s32 dst_y) {
 
                 if(entity->subtype == Dragon) {
                     ent->hp -= 2;
+                    entity->timer = 10.f;
                 }
 
                 if(entity->hp <= 0) {

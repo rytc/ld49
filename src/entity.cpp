@@ -39,7 +39,7 @@ typedef enum Item_Type_E {
 
 const char* g_item_names[] {
     "Sword", "Bow", "Axe", "Leather Armor", "Iron Armor", "Steel Armor", "Feathers", "Chicken Meat", "Bones", "Ghost Essence",
-    "Candy Corn", "Garlic", "Zombie Flesh", "Decaying Bones", "Brains", "Pumpkin"
+    "Candy Corn", "Garlic", "Zombie Flesh", "Zombie Bones", "Brains", "Pumpkin"
 };
 
 typedef enum Entity_State_E {

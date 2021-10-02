@@ -9,6 +9,9 @@ enum Dialog_Sequence_ID {
     DIALOG_SEQUENCE_INTRO,
     DIALOG_SEQUENCE_SWORD_ASK,
     DIALOG_SEQUENCE_SWORD_GET,
+    DIALOG_SEQUENCE_LEVELED,
+    DIALOG_SEQUENCE_GOLD,
+    DIALOG_SEQUENCE_QUALIFIED,
     DIALOG_SEQUENCE_LOSE,
     DIALOG_SEQUENCE_GAME_WIN,
     DIALOG_SEQUENCE_NO_LOOT,
@@ -50,6 +53,16 @@ static const Dialog_Sequence_Definition d_sequences[] = {
             "Now prove your self by defeating the dragon!"
         }},
     {1, 0, {
+            "Congrats, you have reached the level requirement for the Legendary Sword.\n Now you need gold.",
+        }},
+    {1, 0, {
+            "Congrats, you have enough gold for the Legendary Sword.\n Now you need the experience.",
+        }},
+    {1, 0, {
+            "You have qualified for the sword, Traveler. Go ahead and take it.",
+        }},
+
+    {1, 0, {
             "You have failed me for the last time Traveler. Your adventers are over.",
         }},
     {1, 0, {
@@ -66,22 +79,22 @@ static const Dialog_Sequence_Definition d_sequences[] = {
         "Don't waste my time with this, bring me what I want!"
     }},
     {1, 0, { // Sword
-        "Bring me something with two sharp edges."
+        "Bring me a sword."
     }},
     {1, 0, { // Bow
-        "Find a weapon that has a string."
+        "Find a weapon that is stringed."
     }},
     {1, 0, { // Axe
         "Search for something that can fell trees and foes."
     }},
     {1, 0, { // Leather Armor
-        "My stock is low on light armor."
+        "My stock is low on leather armor."
     }},
     {1, 0, { // Iron Armor
-        "Iron protection is in high demand."
+        "Iron armor is in high demand."
     }},
     {1, 0, { // Steel Armor
-        "Steel is a rare commodity, get something."
+        "Some high-level clients are looking for Steel Armor."
     }},
     {1, 0, { // Feathers
         "I need material for a pillow." 
@@ -96,7 +109,7 @@ static const Dialog_Sequence_Definition d_sequences[] = {
         "I need ghost essence for my potions, Traveler." 
     }},
     {1, 0, { // Candy corn
-        "The Trick-or-Treaters are upon us, finde something sweet." 
+        "The Trick-or-Treaters are upon us, find something sweet." 
     }},
     {1, 0, { // Garlic
         "Bring me a savoury ingredient." 

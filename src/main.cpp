@@ -76,6 +76,22 @@ int main(int argc, char** argv) {
                         g_game.dialog_line = 0;
                         g_game.state = Dialog;
 
+                    } else if(g_game.dialog_seq >= DIALOG_SEQUENCE_SEARCH_0 && g_game.dialog_seq <= DIALOG_SEQUENCE_SEARCH_15) {
+                        if(g_game.player_level >= 15 && g_game.player_gold < 100) {
+                            g_game.dialog_seq = DIALOG_SEQUENCE_LEVELED;
+                            g_game.dialog_line = 0;
+                            g_game.state = Dialog;
+                        } else if(g_game.player_level < 15 && g_game.player_gold >= 100) {
+                            g_game.dialog_seq = DIALOG_SEQUENCE_GOLD;
+                            g_game.dialog_line = 0;
+                            g_game.state = Dialog;
+                        } else if(g_game.player_level >= 15 && g_game.player_gold >= 100) {
+                            g_game.dialog_seq = DIALOG_SEQUENCE_QUALIFIED;
+                            g_game.dialog_line = 0;
+                            g_game.state = Dialog;
+                        } else {
+                            g_game.state = Gameplay;
+                        }
 
                     } else if(g_game.dialog_seq == DIALOG_SEQUENCE_LOSE) {
                         g_game.state = Game_Over;
