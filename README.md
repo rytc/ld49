@@ -10,5 +10,7 @@ Un's Table is my entry for Ludum Dare 49, a game about the unscrupulous merchant
 * Raylib
 
 ## How to build
-* Windows: run `build.bat`. Uses msvc 2019 to compile, make sure to run `vcvarsall.bat`
+Note that sounds and textures are not in the Github repo, and must be downloaded through the release file. 
+* Windows: run `build.bat`. Uses msvc 2019 to compile, make sure to run `vcvarsall.bat`. Will need to create the "bin" directory for build output, and add the raylib.dll
+
 
