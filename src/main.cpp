@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
 
     while(running) {
 
-        if(WindowShouldClose() || g_game.state == Game_Over_Lose) {
+        if(WindowShouldClose() || g_game.state == Game_Over) {
             running = false;
             continue;
         }
@@ -70,8 +70,11 @@ int main(int argc, char** argv) {
                         g_game.state = Gameplay;
                         // Spawn entities
                     } else if(g_game.dialog_seq == DIALOG_SEQUENCE_LOSE) {
-                        g_game.state = Game_Over_Lose;
+                        g_game.state = Game_Over;
                         PlaySound(g_game.sounds[Snd_Game_Over]);
+                        running = false;
+                    } else if(g_game.dialog_seq == DIALOG_SEQUENCE_GAME_WIN) {
+                        g_game.state = Game_Over;
                         running = false;
                     } else {
                         g_game.state = Gameplay;

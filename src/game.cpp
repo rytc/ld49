@@ -137,10 +137,12 @@ can_move(Entity* ent, s32 dst_x, s32 dst_y) {
                     } 
                     s32 loot = get_rand(0, DROP_TABLE_SIZE-1);
                     add_item(g_game.entity_list, entity->pos_x, entity->pos_y, entity->drop_table[loot]);
+                    g_game.monster_type_count[entity->subtype] -= 1;
+
                     remove_entity(g_game.entity_list, entity->id);
                     g_game.player_exp += 1;
                     g_game.monster_count -= 1;
-                    
+                                        
                 }
                 PlaySound(g_game.sounds[Snd_Hit]);
             } else if(entity->type == Item) {
@@ -229,13 +231,20 @@ draw_world() {
 
 static void
 spawn_monsters() {
-    while(g_game.monster_count < 13) {
+    while(g_game.monster_count < 15) {
         s32 x = get_rand(1, 23);
         s32 y = get_rand(1, 17);
         if(!can_spawn(x, y)) continue;
         Entity_Subtype type = (Entity_Subtype)get_rand(0, 4);
+
+        for(s32 i = 0; i < 5; i++) {
+            if(g_game.monster_type_count[i] < 3) {
+                type = (Entity_Subtype)i;
+            }
+        }
         add_monster(g_game.entity_list, x, y, type);
         g_game.monster_count += 1;
+        g_game.monster_type_count[type] += 1;
     } 
 }
 

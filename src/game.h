@@ -24,7 +24,7 @@ typedef enum Game_State_E {
     Intro,
     Gameplay,
     Dialog,
-    Game_Over_Lose,
+    Game_Over,
 } Game_State;
 
 typedef enum Sound_Effect_E {
@@ -54,6 +54,7 @@ static struct Game_T {
     s32 player_level;
     s32 uns_desire;
 
+    s32 monster_type_count[5];
     s32 monster_count;
     f32 spawn_timer;
 
