@@ -66,9 +66,17 @@ int main(int argc, char** argv) {
             if(IsKeyPressed(KEY_SPACE)) { 
                 if(continue_dialog() == false) {
                     if(g_game.dialog_seq == DIALOG_SEQUENCE_INTRO) {
+                        g_game.dialog_seq = DIALOG_SEQUENCE_SEARCH_0 + g_game.uns_desire;
+                        g_game.dialog_line = 0;
+                        g_game.state = Dialog;
                         spawn_monsters();
-                        g_game.state = Gameplay;
                         // Spawn entities
+                    } else if(g_game.dialog_seq == DIALOG_SEQUENCE_UNS_SUCCESS) {
+                        g_game.dialog_seq = DIALOG_SEQUENCE_SEARCH_0 + g_game.uns_desire;
+                        g_game.dialog_line = 0;
+                        g_game.state = Dialog;
+
+
                     } else if(g_game.dialog_seq == DIALOG_SEQUENCE_LOSE) {
                         g_game.state = Game_Over;
                         PlaySound(g_game.sounds[Snd_Game_Over]);
