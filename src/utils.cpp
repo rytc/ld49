@@ -65,9 +65,19 @@ static Vector2 normalize(Vector2 a) {
     return {a.x / len, a.y / len};
 }
 
+#if 0
 static void update_camera(Camera2D *cam, Vector2 player_pos) {
     cam->target.x = (player_pos.x + 16.f) - ((SCREEN_WIDTH / cam->zoom) / 2.f);
     cam->target.y = (player_pos.y + 16.f) - ((SCREEN_HEIGHT / cam->zoom) / 2.f);
 }
+#endif
 
+static inline f32
+lerp(f32 a, f32 b, f32 alpha) {
+    return a * (1.0f - alpha) + (b * alpha);
+}
 
+static inline s32
+sign(s32 x) {
+    return (x > 0) - (x < 0);
+}

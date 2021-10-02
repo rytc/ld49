@@ -21,6 +21,15 @@ typedef double f64;
     #define d_assert(cond)
 #endif
 
+typedef enum Direction_E {
+    DIR_NORTH,
+    DIR_EAST,
+    DIR_SOUTH,
+    DIR_WEST
+} Direction;
+
+
+
 static 
 u64 align_up(u64 address, u32 multiple) {
     if(multiple == 0) return address;
