@@ -87,7 +87,7 @@ static const Dialog_Sequence_Definition d_sequences[] = {
         "I need material for a pillow." 
     }},
     {1, 0, { // Chicken Meat
-        "Bring me something to cook for supper." 
+        "Bring me chicken to cook for supper." 
     }},
     {1, 0, { // Bones
         "Have any chicken bones? I am going to make stew." 

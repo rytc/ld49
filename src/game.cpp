@@ -266,6 +266,9 @@ update_game() {
         return;
     }
 
+    if(g_game.player_level >= 99) g_game.player_level = 99;
+    if(g_game.player_gold >= 500) g_game.player_gold = 500;
+
     if(IsKeyPressed(KEY_W) || IsKeyPressed(KEY_UP)) {
         move_entity(g_game.player, DIR_NORTH);
     } else if(IsKeyPressed(KEY_S) || IsKeyPressed(KEY_DOWN)) {
