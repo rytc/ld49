@@ -1,4 +1,4 @@
-# Ludum Dare 49 Jam Game
+# Uns' Table: Ludum Dare 49 Jam Game
 
 Un's Table is my entry for Ludum Dare 49, a game about the unscrupulous merchant named Uns. The theme for the Jam is Unstable. The goal is to bring Uns the Unscrupulous Merchant the loot that he desires. Be careful, he is particular about his loot!
 

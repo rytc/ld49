@@ -8,7 +8,7 @@ struct Dialog_Sequence_Definition {
 enum Dialog_Sequence_ID {
     DIALOG_SEQUENCE_INTRO,
     DIALOG_SEQUENCE_SWORD_ASK,
-    DIALOG_SEQUENCE_WIN,
+    DIALOG_SEQUENCE_SWORD_GET,
     DIALOG_SEQUENCE_LOSE,
     DIALOG_SEQUENCE_NO_LOOT,
     DIALOG_SEQUENCE_UNS_SUCCESS,
@@ -46,7 +46,7 @@ static const Dialog_Sequence_Definition d_sequences[] = {
     {3, 0, {
             "Wow Traveler, you have impressed me. Maybe you are of the strongest.",
             "You have earned yourself the Legendary Sword.",
-            "You win!"
+            "Now prove your self by defeating the dragon!"
         }},
     {1, 0, {
             "You have failed me for the last time Traveler. Your adventers are over.",

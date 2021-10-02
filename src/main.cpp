@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
         snprintf(buff, 196, "Gold: %i", g_game.player_gold);
         DrawText(buff, 196,8, 20, YELLOW);
         snprintf(buff, 128, "HP: %i", g_game.player->hp);
-        DrawText(buff, 120, 8, 20, RED);
+        DrawText(buff, 96, 8, 20, RED);
         snprintf(buff, 128, "LVL: %i", g_game.player_level);
         DrawText(buff, 10, 8, 20, BLUE);
         if(g_game.state == Intro) {

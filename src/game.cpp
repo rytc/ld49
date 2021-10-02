@@ -16,7 +16,7 @@ init_game() {
         player->type = Player;
         player->pos_x = 1;
         player->pos_y = 1;
-        player->hp = 110;
+        player->hp = 100;
         g_game.player = player;
         g_game.player_inventory = None;
         g_game.player_gold = 0;
@@ -45,6 +45,10 @@ init_game() {
     g_game.sounds[Snd_Fail] = LoadSound("sound/fail.wav");
     g_game.sounds[Snd_Game_Over] = LoadSound("sound/gameover.wav");
     g_game.sounds[Snd_Win] = LoadSound("sound/win.wav");
+
+    g_game.music = LoadMusicStream("sound/music.mp3");
+    SetMusicVolume(g_game.music, 1.f);
+    PlayMusicStream(g_game.music);
 
 }
 
@@ -133,7 +137,7 @@ can_move(Entity* ent, s32 dst_x, s32 dst_y) {
                     g_game.dialog_line = 0;
                     g_game.state = Dialog;
                 } else {
-                    g_game.dialog_seq = DIALOG_SEQUENCE_WIN;
+                    g_game.dialog_seq = DIALOG_SEQUENCE_SWORD_GET;
                     g_game.dialog_line = 0;
                     g_game.state = Dialog;
                     remove_entity(g_game.entity_list, entity->id);
@@ -234,6 +238,7 @@ draw_dialog() {
 
 static void
 update_game() {
+    UpdateMusicStream(g_game.music);
 
     if(g_game.player->hp <= 0 && g_game.state == Gameplay) {
 
@@ -275,6 +280,23 @@ update_game() {
 
         if(!update_entity(entity)) {
             remove_entity(g_game.entity_list, entity->id);
+        } else {
+            if(entity->type == Monster) {
+                entity->timer += GetFrameTime();
+                if(entity->timer > 2.f) {
+                    entity->timer = 0;
+                    s32 dir = get_rand(0,12);
+                    if(dir < 3 && can_spawn(entity->pos_x, entity->pos_y - 1)) {
+                        move_entity(entity, DIR_NORTH);
+                    } else if(dir < 6 && can_spawn(entity->pos_x, entity->pos_y + 1)) {
+                        move_entity(entity, DIR_SOUTH);
+                    } else if(dir < 9 && can_spawn(entity->pos_x + 1, entity->pos_y)) {
+                        move_entity(entity, DIR_EAST);
+                    } else if(dir <= 12 && can_spawn(entity->pos_x - 1, entity->pos_y)) {
+                        move_entity(entity, DIR_WEST);
+                    }
+                }
+            }
         }
     }
 

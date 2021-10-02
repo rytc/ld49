@@ -222,6 +222,8 @@ update_entity(Entity* ent) {
         }
     }
 
+    
+
     return true;
 }
 
@@ -270,6 +272,7 @@ add_monster(Entity_List *entity_list, s32 x, s32 y, Entity_Subtype type) {
     ent->pos_x = x;
     ent->pos_y = y;
     ent->state = Idle;
+    ent->timer = 0;
 
     switch(type) {
         case Soldier: {

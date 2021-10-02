@@ -58,6 +58,7 @@ static struct Game_T {
     f32 spawn_timer;
 
     Sound sounds[SOUND_COUNT];
+    Music music;
 } g_game;
 
 
