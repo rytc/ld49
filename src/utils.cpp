@@ -6,7 +6,7 @@ struct Rand_State {
 };
 
 void init_rand(Rand_State *state) {
-    state->seed = (u64)(100000.0 *GetTime());
+    state->seed = (u64)(132947.0 * GetTime());
 }
 
 u64 get_rand(Rand_State *state) {
@@ -15,6 +15,11 @@ u64 get_rand(Rand_State *state) {
     state->seed ^= state->seed << 31;
     state->seed ^= state->seed >> 18;
     return u64(result >> 32ull);
+}
+
+static u64 
+get_rand(s32 min, s32 max) {
+    return GetRandomValue(min, max);
 }
 
 struct Allocator {

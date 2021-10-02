@@ -7,6 +7,8 @@ init_game() {
     init_entity_list(g_game.entity_list);
     
     g_game.sprites = LoadTexture("sprites.png");
+    g_game.monster_count = 0;
+    g_game.uns_desire = get_rand(0, ITEM_TYPE_COUNT-1);
 
     Entity_ID player_id = add_entity(g_game.entity_list);
     {
@@ -14,8 +16,9 @@ init_game() {
         player->type = Player;
         player->pos_x = 1;
         player->pos_y = 1;
-        player->hp = 100;
+        player->hp = 110;
         g_game.player = player;
+        g_game.player_inventory = None;
         g_game.player_gold = 0;
     }
     
@@ -27,6 +30,21 @@ init_game() {
         uns->pos_y = 9;
     }
 
+    Entity_ID legendary_id = add_entity(g_game.entity_list);
+    {
+        Entity* sword = get_entity(g_game.entity_list, legendary_id);
+        sword->type = Legendary_Sword;
+        sword->pos_x = 1;
+        sword->pos_y = 8;
+    }
+
+    g_game.sounds[Snd_Hit] = LoadSound("sound/hit.wav");
+    g_game.sounds[Snd_Level_Up] = LoadSound("sound/levelup.wav");
+    g_game.sounds[Snd_Pickup] = LoadSound("sound/pickup.wav");
+    g_game.sounds[Snd_Success] = LoadSound("sound/success.wav");
+    g_game.sounds[Snd_Fail] = LoadSound("sound/fail.wav");
+    g_game.sounds[Snd_Game_Over] = LoadSound("sound/gameover.wav");
+    g_game.sounds[Snd_Win] = LoadSound("sound/win.wav");
 
 }
 
@@ -43,20 +61,86 @@ get_tile_id_at(s32 x, s32 y) {
 static inline bool 
 is_tile_blocked(s32 x, s32 y) {
     u32 tile_id = get_tile_id_at(x, y);
-    if(tile_id > 2 && tile_id < 11) return true;
+    if(tile_id == 0 || (tile_id > 2 && tile_id < 10)) return true;
     return false;
+}
+
+static bool
+can_spawn(s32 x, s32 y) {
+    if(is_tile_blocked(x, y)) return false;
+    if(get_entity_at(g_game.entity_list, x, y)) return false;
+
+    // Don't spawn in the shop!
+    if(x > 0 && x <= 6 && 
+       y > 6 && y < 11) return false;
+
+    return true;
 }
 
 static bool
 can_move(Entity* ent, s32 dst_x, s32 dst_y) {
 
-    if(ent->type == Player) {
+    if(ent->type == Player && ent->hp > 0) {
         Entity *entity = get_entity_at(g_game.entity_list, dst_x, dst_y);
         if(entity) {
             if(entity->type == Uns) {
                 if(g_game.state == Intro) {
                     g_game.state = Dialog;
+                } else if(g_game.state == Gameplay) {
+                    if(g_game.player_inventory != None) {
+                        if(g_game.player_inventory != g_game.uns_desire) {
+                            g_game.dialog_seq = DIALOG_SEQUENCE_WRONG;
+                            g_game.dialog_line = 0;
+                            g_game.state = Dialog;
+                            g_game.player_inventory = None;
+                            PlaySound(g_game.sounds[Snd_Fail]);
+                            if(g_game.player_gold > 5) {
+                                g_game.player_gold -= 5;
+                            }
+
+                            if(g_game.player->hp > 0) {
+                                g_game.player->hp -= 10;
+                            }
+                        } else {
+                            g_game.dialog_seq = DIALOG_SEQUENCE_UNS_SUCCESS;
+                            g_game.dialog_line = 0;
+                            g_game.state = Dialog;
+                            PlaySound(g_game.sounds[Snd_Success]);
+                            g_game.player_inventory = None;
+                            g_game.player_gold += 10;
+                            g_game.uns_desire = get_rand(0, ITEM_TYPE_COUNT-1);
+                        }
+                    } else {
+                        g_game.dialog_seq = DIALOG_SEQUENCE_SEARCH_0 + g_game.uns_desire;
+                        g_game.dialog_line = 0;
+                        g_game.state = Dialog;
+                    }
+                                    }
+            } else if(entity->type == Monster) {
+                s32 loot = get_rand(0, DROP_TABLE_SIZE-1);
+                add_item(g_game.entity_list, entity->pos_x, entity->pos_y, entity->drop_table[loot]);
+                remove_entity(g_game.entity_list, entity->id);
+                g_game.player_exp += 1;
+                g_game.monster_count -= 1;
+                PlaySound(g_game.sounds[Snd_Hit]);
+            } else if(entity->type == Item) {
+                g_game.player_inventory = entity->subtype;
+                remove_entity(g_game.entity_list, entity->id);
+                PlaySound(g_game.sounds[Snd_Pickup]);
+            } else if(entity->type == Legendary_Sword && g_game.state == Gameplay) {
+                if(g_game.player_level < 15 && g_game.player_gold < 100) {
+                    g_game.dialog_seq = DIALOG_SEQUENCE_SWORD_ASK;
+                    g_game.dialog_line = 0;
+                    g_game.state = Dialog;
+                } else {
+                    g_game.dialog_seq = DIALOG_SEQUENCE_WIN;
+                    g_game.dialog_line = 0;
+                    g_game.state = Dialog;
+                    remove_entity(g_game.entity_list, entity->id);
+                    g_game.player_gold -= 100;
+                    PlaySound(g_game.sounds[Snd_Win]);
                 }
+                
             }
 
             return false;
@@ -97,16 +181,14 @@ move_entity(Entity *ent, Direction dir) {
     }
 }
 
-
-
-static void
+static bool 
 continue_dialog() {
     auto seq_def = d_sequences[g_game.dialog_seq];
     if(g_game.dialog_line < seq_def.dialog_count - 1) {
         g_game.dialog_line += 1;
+        return true;
     } else {
-        g_game.dialog_seq = -1;
-        g_game.state = Gameplay;
+        return false;
     }
 }
 
@@ -121,9 +203,19 @@ draw_world() {
 
         }
     }
+    draw_entities(g_game.entity_list, g_game.sprites);
+}
 
-    Vector2 player_pos = get_entity_world_pos(g_game.player);
-    DrawTexturePro(g_game.sprites, Rectangle{(f32)88, 0,8,8}, Rectangle{player_pos.x, player_pos.y, 32, 32}, Vector2{0, 0}, 0, WHITE);
+static void
+spawn_monsters() {
+    do {
+        s32 x = get_rand(1, 23);
+        s32 y = get_rand(1, 17);
+        if(!can_spawn(x, y)) continue;
+        Entity_Subtype type = (Entity_Subtype)get_rand(0, 4);
+        add_monster(g_game.entity_list, x, y, type);
+        g_game.monster_count += 1;
+    } while(g_game.monster_count < 13);
 }
 
 static void
@@ -132,6 +224,8 @@ draw_dialog() {
     DrawRectangleRec({0,400, 800, 300}, {0,0,0,128});
     if(seq_def.author == 0) {
         DrawText("Uns, the Unscrupulous Merchant", 24, 424, 20, YELLOW); 
+    } else if(seq_def.author == 1) {
+        DrawText("Legendary Sword", 24, 424, 20, DARKPURPLE); 
     }
     DrawText(seq_def.lines[g_game.dialog_line], 24, 460, 20, WHITE); 
     DrawText("Press SPACE to continue...", 24, 550, 20, GRAY); 
@@ -140,6 +234,16 @@ draw_dialog() {
 
 static void
 update_game() {
+
+    if(g_game.player->hp <= 0 && g_game.state == Gameplay) {
+
+        g_game.dialog_seq = DIALOG_SEQUENCE_LOSE;
+        g_game.dialog_line = 0;
+        g_game.state = Dialog;
+
+        return;
+    }
+
     if(IsKeyPressed(KEY_W) || IsKeyPressed(KEY_UP)) {
         move_entity(g_game.player, DIR_NORTH);
     } else if(IsKeyPressed(KEY_S) || IsKeyPressed(KEY_DOWN)) {
@@ -152,7 +256,27 @@ update_game() {
         move_entity(g_game.player, DIR_WEST);
     }
 
-    update_entity(g_game.player);
+    if(g_game.state == Gameplay) {
+        g_game.spawn_timer += GetFrameTime();
+    }
+
+    if(g_game.spawn_timer >= 5.f) {
+        g_game.spawn_timer = 0;
+        spawn_monsters();
+    }
+
+    if(g_game.player_exp >= 10) {
+        g_game.player_level += 1;
+        g_game.player_exp = 0;
+        PlaySound(g_game.sounds[Snd_Level_Up]);
+    }
+    for(s32 entity_index = 0; entity_index < g_game.entity_list->entity_count; entity_index++) {
+        Entity *entity = &g_game.entity_list->entities[entity_index];
+
+        if(!update_entity(entity)) {
+            remove_entity(g_game.entity_list, entity->id);
+        }
+    }
 
 }
 

@@ -36,6 +36,10 @@ typedef enum Item_Type_E {
     ITEM_TYPE_COUNT
 } Item_Type;
 
+const char* g_item_names[] {
+    "Sword", "Bow", "Axe", "Leather Armor", "Iron Armor", "Steel Armor", "Feathers", "Chicken Meat", "Bones", "Ghost Essence",
+    "Candy Corn", "Garlic", "Zombie Flesh", "Decaying Bones", "Brains", "Pumpkin"
+};
 
 typedef enum Entity_State_E {
     Idle = 0,
@@ -50,9 +54,9 @@ typedef enum Entity_Type_E {
     Monster,
     Item,
     Uns,
+    Legendary_Sword,
 
 } Entity_Type;
-
 
 constexpr s32 DROP_TABLE_SIZE = 4;
 s32 g_soldier_drop_table[DROP_TABLE_SIZE] = {
@@ -102,6 +106,7 @@ struct Entity {
     f32 timer;
     Entity_State state;
     s32 hp;
+    s32 *drop_table;
 };
 
 static constexpr s32 MAX_ENTITY_COUNT = 64*1024;
@@ -121,7 +126,6 @@ struct Entity_List {
    u16 freelist_enqueue;
    u16 freelist_dequeue;
 };
-static Entity_List *g_entity_list;
 
 static void
 init_entity_list(Entity_List *entity_list) {
@@ -192,7 +196,7 @@ get_entity_world_pos(Entity* ent) {
     };
 }
 
-static void
+static bool
 update_entity(Entity* ent) {
     if(ent->state == Moving || ent->state == Bump) {
         s32 dir_x = sign(ent->move_delta_x);
@@ -208,9 +212,94 @@ update_entity(Entity* ent) {
             }
 
             ent->state = Idle;
+        }
+    }
 
+    if(ent->type == Item) {
+        ent->timer += GetFrameTime();
+        if(ent->timer >= 2.f) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static void
+draw_entities(Entity_List *entity_list, Texture2D sprites) {
+    for(s32 entity_index = 0; entity_index < entity_list->entity_count; entity_index++) {
+        Entity *entity = &entity_list->entities[entity_index];
+        Vector2 world_pos = get_entity_world_pos(entity);
+
+        if(entity->type == Player) {
+            DrawTexturePro(sprites, Rectangle{(f32)80, 0,8,8}, Rectangle{world_pos.x, world_pos.y, 32, 32}, Vector2{0, 0}, 0, WHITE);
+        } else if(entity->type == Monster) {
+            switch(entity->subtype) {
+                case Soldier: {
+                    DrawTexturePro(sprites, Rectangle{(f32)88, 0,8,8}, Rectangle{world_pos.x, world_pos.y, 32, 32}, Vector2{0, 0}, 0, WHITE);
+                } break;
+                case Archer: {
+                    DrawTexturePro(sprites, Rectangle{(f32)96, 0,8,8}, Rectangle{world_pos.x, world_pos.y, 32, 32}, Vector2{0, 0}, 0, WHITE);
+                } break;
+                case Ghost: {
+                    DrawTexturePro(sprites, Rectangle{(f32)104, 0,8,8}, Rectangle{world_pos.x, world_pos.y, 32, 32}, Vector2{0, 0}, 0, WHITE);
+                } break;
+                case Chicken: {
+                    DrawTexturePro(sprites, Rectangle{(f32)112, 0,8,8}, Rectangle{world_pos.x, world_pos.y, 32, 32}, Vector2{0, 0}, 0, WHITE);
+                } break;
+                case Zombie: {
+                    DrawTexturePro(sprites, Rectangle{(f32)120, 0,8,8}, Rectangle{world_pos.x, world_pos.y, 32, 32}, Vector2{0, 0}, 0, WHITE);
+                } break;
+            }
+        } else if(entity->type == Item) {
+            DrawTexturePro(sprites, Rectangle{(f32)entity->subtype*8, 8,8,8}, Rectangle{world_pos.x, world_pos.y, 32, 32}, Vector2{0, 0}, 0, WHITE);
+        } else if(entity->type == Legendary_Sword) {
+            DrawTexturePro(sprites, Rectangle{(f32)72, 0,8,8}, Rectangle{world_pos.x, world_pos.y, 32, 32}, Vector2{0, 0}, 0, WHITE);
         }
     }
 }
 
+static void
+add_monster(Entity_List *entity_list, s32 x, s32 y, Entity_Subtype type) {
+    Entity_ID id = add_entity(entity_list);
+    Entity* ent = get_entity(entity_list, id);
 
+    ent->type = Monster;
+    ent->subtype = type;
+    ent->hp = 5;
+    ent->pos_x = x;
+    ent->pos_y = y;
+    ent->state = Idle;
+
+    switch(type) {
+        case Soldier: {
+            ent->drop_table = g_soldier_drop_table;
+        } break;
+        case Archer: {
+            ent->drop_table = g_archer_drop_table;
+        } break;
+        case Ghost: {
+            ent->drop_table = g_ghost_drop_table;
+        } break;
+        case Chicken: {
+            ent->drop_table = g_chicken_drop_table;
+        } break;
+
+        case Zombie: {
+            ent->drop_table = g_zombie_drop_table;
+        }
+    }
+}
+
+static void
+add_item(Entity_List *entity_list, s32 x, s32 y, s32 type) {
+    Entity_ID id = add_entity(entity_list);
+    Entity* ent = get_entity(entity_list, id);
+
+    ent->type = Item;
+    ent->subtype = type;
+    ent->pos_x = x;
+    ent->pos_y = y;
+    ent->state = Idle;
+    ent->timer = 0;
+}
