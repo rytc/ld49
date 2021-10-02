@@ -112,6 +112,7 @@ can_move(Entity* ent, s32 dst_x, s32 dst_y) {
                             PlaySound(g_game.sounds[Snd_Success]);
                             g_game.player_inventory = None;
                             g_game.player_gold += 10;
+                            g_game.player_exp += 5;
                             g_game.uns_desire = get_rand(0, ITEM_TYPE_COUNT-1);
                         }
                     } else {
@@ -121,11 +122,26 @@ can_move(Entity* ent, s32 dst_x, s32 dst_y) {
                     }
                                     }
             } else if(entity->type == Monster) {
-                s32 loot = get_rand(0, DROP_TABLE_SIZE-1);
-                add_item(g_game.entity_list, entity->pos_x, entity->pos_y, entity->drop_table[loot]);
-                remove_entity(g_game.entity_list, entity->id);
-                g_game.player_exp += 1;
-                g_game.monster_count -= 1;
+                entity->hp -= 1;
+
+                if(entity->subtype == Dragon) {
+                    ent->hp -= 2;
+                }
+
+                if(entity->hp <= 0) {
+                    if(entity->subtype == Dragon) {
+                        g_game.dialog_seq = DIALOG_SEQUENCE_GAME_WIN;
+                        g_game.dialog_line = 0;
+                        g_game.state = Dialog;
+                        PlaySound(g_game.sounds[Snd_Success]);
+                    } 
+                    s32 loot = get_rand(0, DROP_TABLE_SIZE-1);
+                    add_item(g_game.entity_list, entity->pos_x, entity->pos_y, entity->drop_table[loot]);
+                    remove_entity(g_game.entity_list, entity->id);
+                    g_game.player_exp += 1;
+                    g_game.monster_count -= 1;
+                    
+                }
                 PlaySound(g_game.sounds[Snd_Hit]);
             } else if(entity->type == Item) {
                 g_game.player_inventory = entity->subtype;
@@ -143,6 +159,7 @@ can_move(Entity* ent, s32 dst_x, s32 dst_y) {
                     remove_entity(g_game.entity_list, entity->id);
                     g_game.player_gold -= 100;
                     PlaySound(g_game.sounds[Snd_Win]);
+                    add_monster(g_game.entity_list, 14, 8, Dragon);
                 }
                 
             }
@@ -212,14 +229,14 @@ draw_world() {
 
 static void
 spawn_monsters() {
-    do {
+    while(g_game.monster_count < 13) {
         s32 x = get_rand(1, 23);
         s32 y = get_rand(1, 17);
         if(!can_spawn(x, y)) continue;
         Entity_Subtype type = (Entity_Subtype)get_rand(0, 4);
         add_monster(g_game.entity_list, x, y, type);
         g_game.monster_count += 1;
-    } while(g_game.monster_count < 13);
+    } 
 }
 
 static void

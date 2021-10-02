@@ -5,7 +5,8 @@ typedef enum Entity_Subtype_E {
     Archer,
     Ghost,
     Chicken,
-    Zombie
+    Zombie,
+    Dragon
 } Entity_Subtype;
 
 typedef enum Item_Type_E {
@@ -58,40 +59,45 @@ typedef enum Entity_Type_E {
 
 } Entity_Type;
 
-constexpr s32 DROP_TABLE_SIZE = 4;
+constexpr s32 DROP_TABLE_SIZE = 5;
 s32 g_soldier_drop_table[DROP_TABLE_SIZE] = {
     Sword,
     Iron_Armor,
     Steel_Armor,
     Axe,
+    Bones,
 };
 
 s32 g_archer_drop_table[DROP_TABLE_SIZE] = {
     Bow,
     Leather_Armor,
     Bones,
-    Pumpkin
+    Pumpkin,
+    Sword
 };
 
 s32 g_ghost_drop_table[DROP_TABLE_SIZE] = {
     Ghost_Essence,
     Candy_Corn,
     Garlic,
-    Pumpkin
+    Pumpkin,
+    Iron_Armor
 };
 
 s32 g_chicken_drop_table[DROP_TABLE_SIZE] = {
     Feathers,
     Chicken_Meat,
     Bones,
-    Zombie_Flesh
+    Zombie_Flesh,
+    Leather_Armor
 };
 
 s32 g_zombie_drop_table[DROP_TABLE_SIZE] = {
     Zombie_Flesh,
     Decaying_Bones,
     Brains,
-    Candy_Corn
+    Candy_Corn,
+    Steel_Armor
 };
 
 
@@ -252,6 +258,9 @@ draw_entities(Entity_List *entity_list, Texture2D sprites) {
                 case Zombie: {
                     DrawTexturePro(sprites, Rectangle{(f32)120, 0,8,8}, Rectangle{world_pos.x, world_pos.y, 32, 32}, Vector2{0, 0}, 0, WHITE);
                 } break;
+                case Dragon: {
+                    DrawTexturePro(sprites, Rectangle{(f32)0, 16,8,8}, Rectangle{world_pos.x, world_pos.y, 32, 32}, Vector2{0, 0}, 0, WHITE);
+                }
             }
         } else if(entity->type == Item) {
             DrawTexturePro(sprites, Rectangle{(f32)entity->subtype*8, 8,8,8}, Rectangle{world_pos.x, world_pos.y, 32, 32}, Vector2{0, 0}, 0, WHITE);
@@ -268,7 +277,11 @@ add_monster(Entity_List *entity_list, s32 x, s32 y, Entity_Subtype type) {
 
     ent->type = Monster;
     ent->subtype = type;
-    ent->hp = 5;
+    if(type == Dragon) {
+        ent->hp = 25;
+    } else {
+        ent->hp = 1;
+    }
     ent->pos_x = x;
     ent->pos_y = y;
     ent->state = Idle;
@@ -287,7 +300,6 @@ add_monster(Entity_List *entity_list, s32 x, s32 y, Entity_Subtype type) {
         case Chicken: {
             ent->drop_table = g_chicken_drop_table;
         } break;
-
         case Zombie: {
             ent->drop_table = g_zombie_drop_table;
         }

@@ -10,6 +10,7 @@ enum Dialog_Sequence_ID {
     DIALOG_SEQUENCE_SWORD_ASK,
     DIALOG_SEQUENCE_SWORD_GET,
     DIALOG_SEQUENCE_LOSE,
+    DIALOG_SEQUENCE_GAME_WIN,
     DIALOG_SEQUENCE_NO_LOOT,
     DIALOG_SEQUENCE_UNS_SUCCESS,
     DIALOG_SEQUENCE_WRONG,
@@ -51,7 +52,9 @@ static const Dialog_Sequence_Definition d_sequences[] = {
     {1, 0, {
             "You have failed me for the last time Traveler. Your adventers are over.",
         }},
-
+    {1, 0, {
+            "You have defeated the dragon! You truely are of the strongest! You Win!",
+        }},
     {2, 0, {
             "Are the creatures of the forest too strong for you Traveler?",
             "The Legendary Sword is for the strongest, and you are of\n the weakest."
