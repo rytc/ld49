@@ -18,13 +18,13 @@ static Rand_State g_rand;
 #include "entity.cpp"
 #include "game.cpp"
 
-int main(int argc, char** argv) {
+//int main(int argc, char** argv) {
+int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
     InitWindow(800, 600, "Uns' Table");
     InitAudioDevice();
     SetTargetFPS(60);
 
     init_game();
-    init_rand(&g_rand);
     bool running = true;
 
     while(running) {
@@ -77,15 +77,7 @@ int main(int argc, char** argv) {
                         g_game.state = Dialog;
 
                     } else if(g_game.dialog_seq >= DIALOG_SEQUENCE_SEARCH_0 && g_game.dialog_seq <= DIALOG_SEQUENCE_SEARCH_15) {
-                        if(g_game.player_level >= 15 && g_game.player_gold < 100) {
-                            g_game.dialog_seq = DIALOG_SEQUENCE_LEVELED;
-                            g_game.dialog_line = 0;
-                            g_game.state = Dialog;
-                        } else if(g_game.player_level < 15 && g_game.player_gold >= 100) {
-                            g_game.dialog_seq = DIALOG_SEQUENCE_GOLD;
-                            g_game.dialog_line = 0;
-                            g_game.state = Dialog;
-                        } else if(g_game.player_level >= 15 && g_game.player_gold >= 100) {
+                        if(g_game.player_level >= 15 && g_game.player_gold >= 100) {
                             g_game.dialog_seq = DIALOG_SEQUENCE_QUALIFIED;
                             g_game.dialog_line = 0;
                             g_game.state = Dialog;
