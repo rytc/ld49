@@ -124,7 +124,7 @@ static const Dialog_Sequence_Definition d_sequences[] = {
         "One zombie brain, please." 
     }},
     {1, 0, { // Pumpkin 
-        "Bring me an orange vegetable" 
+        "Bring me an orange fuit" 
     }},
 
 
